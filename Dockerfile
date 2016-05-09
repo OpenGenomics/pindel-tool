@@ -16,3 +16,4 @@ RUN     git clone https://github.com/genome/pindel.git
 RUN     cd pindel && git checkout v0.2.5b8
 RUN     cd pindel && ./INSTALL /opt/samtools-1.2/htslib-1.2.1
 RUN     cp /opt/pindel/pindel* /usr/local/bin/
+ADD     pindel.py /opt/
