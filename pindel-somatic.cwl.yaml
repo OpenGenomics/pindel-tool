@@ -1,10 +1,11 @@
 
 class: CommandLineTool
 label: Pindel-Somatic
+cwlVersion: v1.0
 baseCommand: [python, /opt/pindel.py, -t, NORMAL, -t TUMOR]
 requirements:
   - class: "DockerRequirement"
-    dockerImageId: "opengenomics/pindel:0.2.5b8"
+    dockerPull: "opengenomics/pindel:0.2.5b8"
 
 inputs:
   - id: "normal"
@@ -51,31 +52,31 @@ inputs:
       prefix: -s
 
   - id: "report_inversions"
-    type: boolean
+    type: boolean?
     default: false
     inputBinding:
       prefix: --report_inversions
 
   - id: "report_duplications"
-    type: boolean
+    type: boolean?
     default: false
     inputBinding:
       prefix: --report_duplications
 
   - id: "report_long_insertions"
-    type: boolean
+    type: boolean?
     default: false
     inputBinding:
       prefix: --report_long_insertions
 
   - id: "report_breakpoints"
-    type: boolean
+    type: boolean?
     default: false
     inputBinding:
       prefix: --report_breakpoints
 
   - id: "report_only_close_mapped_reads"
-    type: boolean
+    type: boolean?
     default: false
     inputBinding:
       prefix: -S
