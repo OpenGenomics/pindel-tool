@@ -23,6 +23,11 @@ inputs:
     inputBinding:
       prefix: -r
 
+  - id: "centromere"
+    type: File
+    inputBinding:
+      prefix: -J
+
   - id: "referenceName"
     type: string
     default: HG19
