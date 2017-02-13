@@ -5,7 +5,9 @@
 #
 
 import logging
-import argparse, os, shutil, subprocess, sys, tempfile, time, shlex, re
+import argparse, os, shutil, sys, tempfile, time, shlex, re
+# the original subprocess gives a pipe to STDOUT error in the samtools view command
+import subprocess32 as subprocess
 import datetime
 from multiprocessing import Pool
 import vcf
