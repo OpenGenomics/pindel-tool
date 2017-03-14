@@ -3,7 +3,7 @@ FROM ubuntu
 
 RUN     apt-get update
 RUN     apt-get install -y git wget make gcc zlib1g-dev ncurses-dev g++ python python-pip
-RUN     pip install PyVCF
+RUN     pip install PyVCF subprocess32
 
 WORKDIR /opt
 
