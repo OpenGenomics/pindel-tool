@@ -5,7 +5,7 @@ cwlVersion: v1.0
 baseCommand: [python, /opt/pindel.py, -t, NORMAL, -t TUMOR]
 requirements:
   - class: "DockerRequirement"
-    dockerPull: "opengenomics/pindel:0.2.5b8"
+    dockerPull: "opengenomics/pindel:latest"
 
 inputs:
   - id: "normal"
