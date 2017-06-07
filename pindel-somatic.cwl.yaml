@@ -35,8 +35,8 @@ inputs:
       prefix: -R
 
   - id: "windowSize"
-    type: int
-    default: 2
+    type: float
+    default: 5
     inputBinding:
       prefix: --window_size
 

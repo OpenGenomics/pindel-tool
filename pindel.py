@@ -73,7 +73,7 @@ def pindel(reference, configFile, args, tempDir, chrome=None):
     opt_list = [
         ["number_of_threads", "%d"],
         ["max_range_index", "%d"],
-        ["window_size", "%d"],
+        ["window_size", "%f"],
         ["sequencing_error_rate", "%f"],
         ["sensitivity", "%f"],
         ["maximum_allowed_mismatch_rate", "%f"],
@@ -176,10 +176,9 @@ def getMeanInsertSize(bamFile):
     return mean
 
 
-
 def __main__():
     logging.basicConfig(level=logging.INFO)
-    time.sleep(1) #small hack, sometimes it seems like docker file systems aren't avalible instantly
+    time.sleep(1)  # small hack, sometimes it seems like docker file systems aren't avalible instantly
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-r', dest='inputFastaFile', required=True, help='the reference file')
     parser.add_argument('-R', dest='inputFastaName', default="genome", help='the reference name')
@@ -191,12 +190,12 @@ def __main__():
     parser.add_argument('-o1', dest='outputRaw', help='the output raw', default=None)
     parser.add_argument('-o2', dest='outputVcfFile', help='the output vcf', default=None)
     parser.add_argument('-o3', dest='outputSomaticVcfFile', help='the output somatic filtered vcf', default=None)
-    
+
     parser.add_argument('--number_of_threads', dest='number_of_threads', type=int, default=2)
     parser.add_argument('--number_of_procs', dest='procs', type=int, default=1)
 
     parser.add_argument('-x', '--max_range_index', dest='max_range_index', type=int, default=None)
-    parser.add_argument('--window_size', dest='window_size', type=int, default=None)
+    parser.add_argument('--window_size', dest='window_size', type=float, default=None)
     parser.add_argument('--sequencing_error_rate', dest='sequencing_error_rate', type=float, default=None)
     parser.add_argument('--sensitivity', dest='sensitivity', default=None, type=float)
     parser.add_argument('--report_long_insertions', dest='report_long_insertions', action='store_true', default=False)
@@ -268,22 +267,22 @@ def __main__():
         seq_hash = {}
         newInputFiles = []
         i = 0
-        #make sure the BAMs are indexed and get the mean insert sizes
+        # make sure the BAMs are indexed and get the mean insert sizes
         for inputBamFile, inputBamIndex, insertSize, sampleTag in zip(inputBamFiles, inputBamFileIndexes, insertSizes, sampleTags ):
             inputFastaFile, inputBamFile = indexBam(args.workdir, args.inputFastaFile, inputBamFile, i, inputBamIndex)
             i += 1
             newInputFiles.append(inputBamFile)
-            if insertSize==None:
+            if insertSize == None:
                 meanInsertSize = getMeanInsertSize(inputBamFile)
             else:
-                meanInsertSize=insertSize
+                meanInsertSize = insertSize
             meanInsertSizes.append( meanInsertSize )
             for seq in get_bam_seq(inputBamFile):
                 seq_hash[seq] = True
         seqs = seq_hash.keys()
         configFile = config(newInputFiles, meanInsertSizes, sampleTags, tempDir)
 
-        #run pindel
+        # run pindel
         pindel_files = []
         if args.procs == 1:
             cmd, pindelFileBase = pindel(inputFastaFile, configFile, args, tempDir)
@@ -305,7 +304,7 @@ def __main__():
                     if os.path.exists(pindelFileBase + suffix):
                         pindel_files.append( pindelFileBase + suffix )
 
-        #run pindel2vcf
+        # run pindel2vcf
         with open(os.path.join(args.workdir, "pindel_all"), "w") as handle:
             for p in pindel_files:
                 with open(p) as ihandle:
@@ -318,7 +317,7 @@ def __main__():
         if args.outputVcfFile is not None:
             cmd = pindel2vcf(inputFastaFile, args.inputFastaName, os.path.join(args.workdir, "pindel_all"), args.outputVcfFile)
             execute(cmd)
-        
+
         if args.outputSomaticVcfFile is not None:
             with open(os.path.join(args.workdir, "pindel_somatic"), "w") as handle:
                 for p in pindel_files:
@@ -333,7 +332,7 @@ def __main__():
                             for line in ihandle:
                                 if re.search("ChrID", line):
                                     handle.write(line)
-            
+
             with open(os.path.join(args.workdir, "somatic.indel.filter.config"), "w") as handle:
                 handle.write("indel.filter.input = %s\n" % os.path.join(args.workdir, "pindel_somatic"))
                 handle.write("indel.filter.vaf = %s\n" % (args.somatic_vaf))
@@ -344,14 +343,13 @@ def __main__():
                 handle.write("indel.filter.referencename = %s\n" % (args.inputFastaName))
                 handle.write("indel.filter.referencedate = %s\n" % (datetime.datetime.now().strftime("%Y%m%d")) )
                 handle.write("indel.filter.output = %s\n" % (args.outputSomaticVcfFile))
-            
+
             execute("%s /opt/pindel/somatic_filter/somatic_indelfilter.pl %s" % (which("perl"), os.path.join(args.workdir, "somatic.indel.filter.config")) )
-            
-                
 
     finally:
         if not args.no_clean and os.path.exists(tempDir):
             shutil.rmtree(tempDir)
 
-if __name__=="__main__":
+
+if __name__ == "__main__":
     __main__()
