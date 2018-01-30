@@ -83,7 +83,7 @@ pindel.py
 -a $additional_mismatch
 -m $min_perfect_match_around_BP
 --sequencing_error_rate $sequencing_error_rate
--u $maximum_allowed_mismatch_rate
+--maximum_allowed_mismatch_rate $maximum_allowed_mismatch_rate
 --sensitivity $sensitivity
 -n $NM
 #if $NormalSamples:
